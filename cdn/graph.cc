@@ -3,7 +3,7 @@
 // Author: Chuncheng Wei
 // Mail: weicc1989@gmail.com
 // Created Time : Fri 24 Nov 2017 12:07:26 AM CST
-// Last Modified: Fri 24 Nov 2017 06:21:39 AM CST
+// Last Modified: Mon 27 Nov 2017 08:48:08 PM CST
 //******************************************************************************
 
 #include "graph.h"
@@ -37,6 +37,7 @@ GRAPH::GRAPH(char* inLines[MAX_IN_NUM], int inLineNum)
   LINKS.resize(nLinks_2side);
   BANDWIDTH.resize(nLinks_2side);
   FEE.resize(nLinks_2side);
+  FLOWOUT.resize(nNnode);
 
   int n = 0;
   while(n < nLinks) {
@@ -52,6 +53,9 @@ GRAPH::GRAPH(char* inLines[MAX_IN_NUM], int inLineNum)
 
       FEE[n]                = vl[3];
       FEE[nLinks_2side-1-n] = vl[3];
+
+      FLOWOUT[vl[0]].push_back(n);
+      FLOWOUT[vl[1]].push_back(nLinks_2side-1-n);
     }
 
     n++;
@@ -86,6 +90,21 @@ void GRAPH::Print(std::vector<int> SNODES, std::vector<int> FLOWS, std::ostrings
     vector<int> path;
     vector<int> root_flow;
 
+    // server node is directly connected to consumption node
+    if(CNODES[SNODES[i]] != -1) {
+
+      path.push_back(SNODES[i]);
+      path.push_back(CNODES[SNODES[i]]);
+      path.push_back(_REQUIREMENT_[SNODES[i]]);
+
+      _REQUIREMENT_[SNODES[i]] = 0;
+
+      ALLPATH.push_back(path);
+
+      path.pop_back(); path.pop_back(); path.pop_back();
+    }
+
+    // init root_flow
     int SF = 0;
     for(unsigned j=0; j<FLOWOUT[SNODES[i]].size(); j++) {
       int id = FLOWOUT[SNODES[i]][j];
@@ -93,16 +112,17 @@ void GRAPH::Print(std::vector<int> SNODES, std::vector<int> FLOWS, std::ostrings
     }
     root_flow.push_back(SF);
 
-    _digpath_(SNODES[i], FLOWS, path, root_flow);
+    // digpath
+    if(root_flow[0] > 0)
+      _digpath_(SNODES[i], FLOWS, path, root_flow);
   }
 
   // print
   os << ALLPATH.size() << "\n\n";
   for(unsigned i=0; i<ALLPATH.size(); i++) {
-    for(unsigned j=0; j<ALLPATH[i].size(); j++) {
-        os << ALLPATH[i][j] << " ";
-      os << "\n";
-    }
+    for(unsigned j=0; j<ALLPATH[i].size(); j++)
+      os << ALLPATH[i][j] << " ";
+    os << "\n";
   }
 }
 
@@ -123,13 +143,14 @@ void GRAPH::_digpath_(int root_node, vector<int> & FLOWS, vector<int> & path, ve
   path.push_back(root_node);
 
   // if connect consumption nodes
-  if(CNODES[root_node] != -1)
+  if(CNODES[root_node] != -1 && REQUIREMENT_[root_node] > 0)
   {
     path.push_back(CNODES[root_node]);
     if(root_flow.back() <= _REQUIREMENT_[root_node]) {
       _REQUIREMENT_[root_node] -= root_flow.back();
       path.push_back(root_flow.back());
       ALLPATH.push_back(path);
+      path.pop_back();
       path.pop_back();
       path.pop_back();
       root_flow.pop_back();
