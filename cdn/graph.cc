@@ -3,7 +3,7 @@
 // Author: Chuncheng Wei
 // Mail: weicc1989@gmail.com
 // Created Time : Fri 24 Nov 2017 12:07:26 AM CST
-// Last Modified: Mon 27 Nov 2017 08:48:08 PM CST
+// Last Modified: Mon 27 Nov 2017 10:39:55 PM CST
 //******************************************************************************
 
 #include "graph.h"
@@ -89,6 +89,7 @@ void GRAPH::Print(std::vector<int> SNODES, std::vector<int> FLOWS, std::ostrings
   for(unsigned i=0; i<SNODES.size(); i++) {
     vector<int> path;
     vector<int> root_flow;
+    vector<int> link_id;
 
     // server node is directly connected to consumption node
     if(CNODES[SNODES[i]] != -1) {
@@ -114,7 +115,7 @@ void GRAPH::Print(std::vector<int> SNODES, std::vector<int> FLOWS, std::ostrings
 
     // digpath
     if(root_flow[0] > 0)
-      _digpath_(SNODES[i], FLOWS, path, root_flow);
+      _digpath_(SNODES[i], FLOWS, path, link_id, root_flow);
   }
 
   // print
@@ -138,17 +139,24 @@ void GRAPH::_readline_(char * line, vector<int> & vl)
   }
 }
 
-void GRAPH::_digpath_(int root_node, vector<int> & FLOWS, vector<int> & path, vector<int> & root_flow)
+void _deduct_(vector<int> & FLOWS, vector<int> & id, int bandwidth)
+{
+  for(unsigned i=0; i<id.size(); i++)
+    FLOWS[id[i]] -= bandwidth;
+}
+
+void GRAPH::_digpath_(int root_node, vector<int> & FLOWS, vector<int> & path, vector<int> & link_id, vector<int> & root_flow)
 {
   path.push_back(root_node);
 
   // if connect consumption nodes
-  if(CNODES[root_node] != -1 && REQUIREMENT_[root_node] > 0)
+  if(CNODES[root_node] != -1 && _REQUIREMENT_[root_node] > 0)
   {
     path.push_back(CNODES[root_node]);
     if(root_flow.back() <= _REQUIREMENT_[root_node]) {
       _REQUIREMENT_[root_node] -= root_flow.back();
       path.push_back(root_flow.back());
+      _deduct_(FLOWS, link_id, path.back());
       ALLPATH.push_back(path);
       path.pop_back();
       path.pop_back();
@@ -161,7 +169,9 @@ void GRAPH::_digpath_(int root_node, vector<int> & FLOWS, vector<int> & path, ve
       path.push_back(_REQUIREMENT_[root_node]);
       root_flow.back() -= _REQUIREMENT_[root_node];
       _REQUIREMENT_[root_node] = 0;
+      _deduct_(FLOWS, link_id, path.back());
       ALLPATH.push_back(path);
+      path.pop_back();
       path.pop_back();
     }
   }
@@ -172,21 +182,26 @@ void GRAPH::_digpath_(int root_node, vector<int> & FLOWS, vector<int> & path, ve
     int id = FLOWOUT[root_node][i];
 
     if(FLOWS[id] != 0) {
+
+      link_id.push_back(id);
+
       if(root_flow.back() > FLOWS[id]) {
         root_flow.back() -= FLOWS[id];
         root_flow.push_back(FLOWS[id]);
-        _digpath_(LINKS[id].second, FLOWS, path, root_flow);
+        _digpath_(LINKS[id].second, FLOWS, path, link_id, root_flow);
       }
       else {
         int temp = root_flow.back();
         root_flow.back() = 0;
         root_flow.push_back(temp);
-        _digpath_(LINKS[id].second, FLOWS, path, root_flow);
+        _digpath_(LINKS[id].second, FLOWS, path, link_id, root_flow);
         break;
       }
-    }
 
+      link_id.pop_back();
+    }
   }
-  path.pop_back();
+
   root_flow.pop_back();
+  path.pop_back();
 }

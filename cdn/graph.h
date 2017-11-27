@@ -3,7 +3,7 @@
 // Author: Chuncheng Wei
 // Mail: weicc1989@gmail.com
 // Created Time : Thu 23 Nov 2017 10:58:07 PM CST
-// Last Modified: Fri 24 Nov 2017 06:20:07 AM CST
+// Last Modified: Mon 27 Nov 2017 09:25:57 PM CST
 //******************************************************************************
 
 #ifndef _GRAPH_H
@@ -48,7 +48,7 @@ class GRAPH
     std::vector< int > _REQUIREMENT_; // REQUIREMENT[adjacent network ID] = consumption nodes requirement
 
     void _readline_(char * line, std::vector<int> & vl);
-    void _digpath_(int root_node, std::vector<int> & FLOWS, std::vector<int> & path, std::vector<int> & root_flow);
+    void _digpath_(int root_node, std::vector<int> & FLOWS, std::vector<int> & path, std::vector<int> & link_id, std::vector<int> & root_flow);
 
 };
 #endif

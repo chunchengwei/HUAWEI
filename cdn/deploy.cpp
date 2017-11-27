@@ -2,6 +2,7 @@
 #include "lib_io.h"
 #include "lib_time.h"
 #include "graph.h"
+#include "simplex.h"
 #include <cstdio>
 #include <cstdlib>
 #include <cassert>
@@ -17,45 +18,22 @@ void deploy_server(char* inLines[MAX_IN_NUM], int inLineNum, const char * const 
 	assert(inLineNum < MAX_IN_NUM);
 
   // print input
-	printf("line count %d\n", inLineNum);
-	for (int i = 0; i < inLineNum; ++i)
-	{
-		printf("line %d=%s\n", i, inLines[i]);
-	}
+	// printf("line count %d\n", inLineNum);
+	// for (int i = 0; i < inLineNum; ++i)
+	// {
+		// printf("line %d=%s\n", i, inLines[i]);
+	// }
 
   // creat graph
   GRAPH graph(inLines, inLineNum);
 
-  // cout<<graph.nNnode<<"\t"<<graph.nLinks<<"\t"<<graph.nCnode<<endl;
-  // cout<<graph.scost<<endl;
 
-  // cout<<"links:"<<endl;
-  // for(unsigned i=0; i<graph.LINKS.size(); i++)
-    // cout<<graph.LINKS[i].first<<"\t"<<graph.LINKS[i].second
-      // <<"\t"<<graph.BANDWIDTH[i]<<"\t"<<graph.FEE[i]<<endl;
+  // calculate
+  srand((int)time(0));
+  calculator cal(graph);
 
-  // cout<<"network nodes:"<<endl;
-  // for(unsigned i=0; i<graph.FLOWOUT.size(); i++) {
-    // cout<<i<<": ";
-    // for(unsigned j=0; j<graph.FLOWOUT[i].size(); j++)
-      // cout<<graph.FLOWOUT[i][j]<<"\t";
-    // cout << endl;
-  // }
-
-  // cout<<"consumption nodes:"<<endl;
-  // for(unsigned i=0; i<graph.CNODES.size(); i++)
-    // cout<<i<<"\t"<<graph.CNODES[i].first<<"\t"<<graph.CNODES[i].second<<endl;
-
-  // cout<<"requirement"<<endl;
-  // for(unsigned i=0; i<graph.REQUIREMENT.size(); i++)
-    // cout<<i<<": "<<graph.REQUIREMENT[i]<<endl;
-
-
-
-
-  vector<int> SNODES = {1,2,3};
-  vector<int> FLOWS = {1,2,3};
-
+  vector<int> SNODES = cal.SNODES;
+  vector<int> FLOWS  = cal.FLOWS;
 
   // output
   ostringstream os;

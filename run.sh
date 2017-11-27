@@ -4,7 +4,7 @@
 # Author: Chuncheng Wei
 # Mail: weicc1989@gmail.com
 # Created Time : Thu 23 Nov 2017 07:56:18 PM CST
-# Last Modified: Thu 23 Nov 2017 08:10:14 PM CST
+# Last Modified: Mon 27 Nov 2017 10:50:15 PM CST
 #******************************************************************************
 
-./bin/cdn case/case0.txt result/result0.txt
+./bin/cdn case/case_li.txt result/result_li.txt
