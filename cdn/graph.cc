@@ -3,7 +3,7 @@
 // Author: Chuncheng Wei
 // Mail: weicc1989@gmail.com
 // Created Time : Fri 24 Nov 2017 12:07:26 AM CST
-// Last Modified: Mon 27 Nov 2017 10:39:55 PM CST
+// Last Modified: Tue 28 Nov 2017 12:46:06 AM DST
 //******************************************************************************
 
 #include "graph.h"
@@ -195,6 +195,7 @@ void GRAPH::_digpath_(int root_node, vector<int> & FLOWS, vector<int> & path, ve
         root_flow.back() = 0;
         root_flow.push_back(temp);
         _digpath_(LINKS[id].second, FLOWS, path, link_id, root_flow);
+        link_id.pop_back();
         break;
       }
 
